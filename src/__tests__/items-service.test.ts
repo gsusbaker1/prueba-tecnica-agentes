@@ -5,6 +5,8 @@ import {
   createItem,
   deleteItem,
   fetchItems,
+  formatSupabaseError,
+  normalizeItemRow,
   updateItemStatus,
 } from '@/lib/items-service';
 import type { Item } from '@/types/item';
@@ -105,5 +107,44 @@ describe('items-service', () => {
     await expect(deleteItem('uuid-123', clientFail)).rejects.toThrow(
       'RLS denied',
     );
+  });
+
+  it('traduce fallos de red y errores RLS a mensajes amigables en español', async () => {
+    const orderFail = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'));
+    const select = vi.fn().mockReturnValue({ order: orderFail });
+    const mockClient = {
+      from: vi.fn().mockReturnValue({ select }),
+    } as unknown as SupabaseClient;
+
+    await expect(fetchItems(mockClient)).rejects.toThrow(
+      /problema de conexión con Supabase/i,
+    );
+
+    expect(
+      formatSupabaseError('crear la tarea', {
+        message: 'new row violates row-level security policy',
+        code: '42501',
+      }),
+    ).toMatch(/permisos de Supabase \(RLS\)/i);
+  });
+
+  it('normaliza filas con valores inesperados o nulos sin romper el tipado', () => {
+    const normalized = normalizeItemRow({
+      id: 'legacy-1',
+      title: 'Tarea legacy',
+      description: '',
+      priority: 'DESCONOCIDA',
+      status: null,
+      created_at: '2026-06-10T09:00:00.000Z',
+    });
+
+    expect(normalized).toEqual({
+      id: 'legacy-1',
+      title: 'Tarea legacy',
+      description: null,
+      priority: 'media',
+      status: 'pendiente',
+      created_at: '2026-06-10T09:00:00.000Z',
+    });
   });
 });

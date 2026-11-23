@@ -19,6 +19,8 @@ import {
   type UpdateItemInput,
 } from '@/types/item';
 import {
+  MAX_DESCRIPTION_LENGTH,
+  MAX_TITLE_LENGTH,
   PRIORITY_METADATA,
   STATUS_METADATA,
   formatRelativeDate,
@@ -123,7 +125,7 @@ export function TaskCard({
 
   if (isEditing) {
     return (
-      <article className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm ring-2 ring-indigo-500/10">
+      <article className="min-w-0 max-w-full overflow-hidden rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm ring-2 ring-indigo-500/10">
         <form onSubmit={handleSaveEdit} className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
@@ -139,22 +141,38 @@ export function TaskCard({
             </button>
           </div>
 
-          <input
-            type="text"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            aria-label="Editar título"
-            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-          />
+          <div className="space-y-1">
+            <div className="flex justify-end">
+              <span className="text-[11px] tabular-nums text-slate-400">
+                {editTitle.length}/{MAX_TITLE_LENGTH}
+              </span>
+            </div>
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              maxLength={MAX_TITLE_LENGTH}
+              aria-label="Editar título"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
 
-          <textarea
-            rows={2}
-            value={editDescription}
-            onChange={(e) => setEditDescription(e.target.value)}
-            aria-label="Editar descripción"
-            placeholder="Añade una descripción..."
-            className="w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-          />
+          <div className="space-y-1">
+            <div className="flex justify-end">
+              <span className="text-[11px] tabular-nums text-slate-400">
+                {editDescription.length}/{MAX_DESCRIPTION_LENGTH}
+              </span>
+            </div>
+            <textarea
+              rows={2}
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              maxLength={MAX_DESCRIPTION_LENGTH}
+              aria-label="Editar descripción"
+              placeholder="Añade una descripción..."
+              className="w-full resize-none rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
 
           <div className="grid grid-cols-2 gap-2.5">
             <select
@@ -185,7 +203,10 @@ export function TaskCard({
           </div>
 
           {editError && (
-            <p role="alert" className="text-xs font-medium text-rose-600">
+            <p
+              role="alert"
+              className="break-words [overflow-wrap:anywhere] text-xs font-medium text-rose-600"
+            >
               {editError}
             </p>
           )}
@@ -217,9 +238,9 @@ export function TaskCard({
   }
 
   return (
-    <article className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 flex-1 space-y-2">
+    <article className="group min-w-0 max-w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 max-w-full flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${statusMeta.badgeClasses}`}
@@ -244,7 +265,7 @@ export function TaskCard({
           </div>
 
           <h3
-            className={`text-base font-semibold tracking-tight ${
+            className={`break-words [overflow-wrap:anywhere] text-base font-semibold tracking-tight ${
               item.status === 'completado'
                 ? 'text-slate-400 line-through'
                 : 'text-slate-900'
@@ -254,7 +275,7 @@ export function TaskCard({
           </h3>
 
           {item.description && (
-            <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600">
+            <p className="break-words [overflow-wrap:anywhere] whitespace-pre-line text-sm leading-relaxed text-slate-600">
               {item.description}
             </p>
           )}

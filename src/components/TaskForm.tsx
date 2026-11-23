@@ -10,6 +10,8 @@ import {
   type ItemStatus,
 } from '@/types/item';
 import {
+  MAX_DESCRIPTION_LENGTH,
+  MAX_TITLE_LENGTH,
   PRIORITY_METADATA,
   STATUS_METADATA,
   validateItemInput,
@@ -94,12 +96,17 @@ export function TaskForm({ onCreate, disabled = false }: TaskFormProps) {
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div>
-          <label
-            htmlFor="task-title"
-            className="mb-1.5 block text-sm font-medium text-slate-700"
-          >
-            Título <span className="text-rose-500">*</span>
-          </label>
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <label
+              htmlFor="task-title"
+              className="block text-sm font-medium text-slate-700"
+            >
+              Título <span className="text-rose-500">*</span>
+            </label>
+            <span className="text-xs tabular-nums text-slate-400">
+              {title.length}/{MAX_TITLE_LENGTH}
+            </span>
+          </div>
           <input
             id="task-title"
             name="title"
@@ -110,7 +117,7 @@ export function TaskForm({ onCreate, disabled = false }: TaskFormProps) {
               if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
             }}
             placeholder="Ej. Corregir error en pasarela de pagos"
-            maxLength={140}
+            maxLength={MAX_TITLE_LENGTH}
             disabled={isFormDisabled}
             aria-invalid={Boolean(errors.title)}
             aria-describedby={errors.title ? 'task-title-error' : undefined}
@@ -128,12 +135,17 @@ export function TaskForm({ onCreate, disabled = false }: TaskFormProps) {
         </div>
 
         <div>
-          <label
-            htmlFor="task-description"
-            className="mb-1.5 block text-sm font-medium text-slate-700"
-          >
-            Descripción
-          </label>
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <label
+              htmlFor="task-description"
+              className="block text-sm font-medium text-slate-700"
+            >
+              Descripción
+            </label>
+            <span className="text-xs tabular-nums text-slate-400">
+              {description.length}/{MAX_DESCRIPTION_LENGTH}
+            </span>
+          </div>
           <textarea
             id="task-description"
             name="description"
@@ -146,7 +158,7 @@ export function TaskForm({ onCreate, disabled = false }: TaskFormProps) {
               }
             }}
             placeholder="Detalles técnicos, pasos para reproducir o criterios de aceptación..."
-            maxLength={1000}
+            maxLength={MAX_DESCRIPTION_LENGTH}
             disabled={isFormDisabled}
             aria-invalid={Boolean(errors.description)}
             className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60"

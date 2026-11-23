@@ -142,6 +142,9 @@ export function sortItemsByNewest(items: Item[]): Item[] {
   });
 }
 
+export const MAX_TITLE_LENGTH = 120;
+export const MAX_DESCRIPTION_LENGTH = 500;
+
 /**
  * Valida la entrada antes de crear o editar una tarea.
  */
@@ -153,12 +156,12 @@ export function validateItemInput(input: CreateItemInput): ValidationResult {
     errors.title = 'El título es obligatorio.';
   } else if (trimmedTitle.length < 3) {
     errors.title = 'El título debe tener al menos 3 caracteres.';
-  } else if (trimmedTitle.length > 140) {
-    errors.title = 'El título no puede superar los 140 caracteres.';
+  } else if (trimmedTitle.length > MAX_TITLE_LENGTH) {
+    errors.title = `El título no puede superar los ${MAX_TITLE_LENGTH} caracteres.`;
   }
 
-  if (input.description && input.description.trim().length > 1000) {
-    errors.description = 'La descripción no puede superar los 1000 caracteres.';
+  if (input.description && input.description.trim().length > MAX_DESCRIPTION_LENGTH) {
+    errors.description = `La descripción no puede superar los ${MAX_DESCRIPTION_LENGTH} caracteres.`;
   }
 
   if (!ITEM_PRIORITIES.includes(input.priority)) {

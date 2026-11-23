@@ -55,4 +55,19 @@ describe('TaskForm', () => {
       expect(descInput.value).toBe('');
     });
   });
+
+  it('aplica maxLength de 120 en título y 500 en descripción con contadores visibles', () => {
+    const onCreate = vi.fn().mockResolvedValue(undefined);
+    render(<TaskForm onCreate={onCreate} />);
+
+    const titleInput = screen.getByLabelText(/título/i) as HTMLInputElement;
+    const descInput = screen.getByLabelText(
+      /descripción/i,
+    ) as HTMLTextAreaElement;
+
+    expect(titleInput).toHaveAttribute('maxLength', '120');
+    expect(descInput).toHaveAttribute('maxLength', '500');
+    expect(screen.getByText('0/120')).toBeInTheDocument();
+    expect(screen.getByText('0/500')).toBeInTheDocument();
+  });
 });

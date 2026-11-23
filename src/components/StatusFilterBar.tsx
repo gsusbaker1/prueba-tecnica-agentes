@@ -57,7 +57,7 @@ export function StatusFilterBar({
               role="tab"
               aria-selected={isActive}
               onClick={() => onStatusChange(option.key)}
-              className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-indigo-500/40 ${
+              className={`flex min-w-0 items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-indigo-500/40 ${
                 isActive
                   ? `${option.accent} shadow-sm`
                   : 'border border-slate-200/80 bg-slate-50/70 text-slate-700 hover:bg-slate-100'
@@ -79,7 +79,7 @@ export function StatusFilterBar({
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="relative flex-1">
+        <div className="relative min-w-0 flex-1">
           <Search
             className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
             aria-hidden="true"
@@ -88,6 +88,7 @@ export function StatusFilterBar({
             type="search"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
+            maxLength={120}
             placeholder="Buscar por título o descripción..."
             aria-label="Buscar tareas"
             className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2 pl-10 pr-3.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"

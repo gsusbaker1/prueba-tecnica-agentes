@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  MAX_DESCRIPTION_LENGTH,
+  MAX_TITLE_LENGTH,
   computeItemCounts,
   filterItems,
   getNextStatus,
@@ -124,6 +126,26 @@ describe('item-utils', () => {
       });
       expect(result.valid).toBe(true);
       expect(result.errors).toEqual({});
+    });
+
+    it('rechaza títulos mayores de 120 caracteres y descripciones mayores de 500', () => {
+      const tooLongTitle = validateItemInput({
+        title: 'W'.repeat(MAX_TITLE_LENGTH + 1),
+        description: '',
+        priority: 'media',
+        status: 'pendiente',
+      });
+      expect(tooLongTitle.valid).toBe(false);
+      expect(tooLongTitle.errors.title).toContain('120');
+
+      const tooLongDescription = validateItemInput({
+        title: 'Título válido',
+        description: 'D'.repeat(MAX_DESCRIPTION_LENGTH + 1),
+        priority: 'media',
+        status: 'pendiente',
+      });
+      expect(tooLongDescription.valid).toBe(false);
+      expect(tooLongDescription.errors.description).toContain('500');
     });
   });
 });

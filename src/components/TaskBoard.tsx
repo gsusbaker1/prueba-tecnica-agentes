@@ -1,12 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
   CheckCircle2,
   ClipboardList,
   Database,
   RefreshCw,
+  X,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import {
@@ -45,11 +46,25 @@ export function TaskBoard() {
   const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>('todas');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const feedbackTimerRef = useRef<number | null>(null);
+
   const showFeedback = useCallback((message: string) => {
+    if (feedbackTimerRef.current !== null) {
+      window.clearTimeout(feedbackTimerRef.current);
+    }
     setFeedbackMessage(message);
-    window.setTimeout(() => {
-      setFeedbackMessage((current) => (current === message ? null : current));
-    }, 3000);
+    feedbackTimerRef.current = window.setTimeout(() => {
+      setFeedbackMessage(null);
+      feedbackTimerRef.current = null;
+    }, 3200);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current !== null) {
+        window.clearTimeout(feedbackTimerRef.current);
+      }
+    };
   }, []);
 
   const loadItems = useCallback(async () => {
@@ -90,6 +105,12 @@ export function TaskBoard() {
     setErrorMessage(null);
     const created = await createItem(input);
     setItems((prev) => sortItemsByNewest([created, ...prev]));
+    if (statusFilter !== 'todos' && statusFilter !== created.status) {
+      setStatusFilter('todos');
+    }
+    if (priorityFilter !== 'todas' && priorityFilter !== created.priority) {
+      setPriorityFilter('todas');
+    }
     showFeedback('Tarea creada correctamente en Supabase.');
   }
 
@@ -177,19 +198,31 @@ export function TaskBoard() {
       {errorMessage && (
         <div
           role="alert"
-          className="flex items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"
         >
-          <div className="flex items-center gap-2.5">
-            <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <span>{errorMessage}</span>
+          <div className="flex min-w-0 flex-1 items-start gap-2.5">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            <span className="break-words [overflow-wrap:anywhere]">
+              {errorMessage}
+            </span>
           </div>
-          <button
-            type="button"
-            onClick={() => void loadItems()}
-            className="shrink-0 rounded-lg bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-800 hover:bg-rose-200"
-          >
-            Reintentar
-          </button>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => void loadItems()}
+              className="rounded-lg bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-800 hover:bg-rose-200"
+            >
+              Reintentar
+            </button>
+            <button
+              type="button"
+              onClick={() => setErrorMessage(null)}
+              aria-label="Cerrar mensaje de error"
+              className="rounded-lg p-1 text-rose-600 hover:bg-rose-100 hover:text-rose-800"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -204,13 +237,13 @@ export function TaskBoard() {
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
-        <aside className="lg:sticky lg:top-6 lg:col-span-4">
+        <aside className="min-w-0 lg:sticky lg:top-6 lg:col-span-4">
           <TaskForm onCreate={handleCreate} disabled={!configured} />
         </aside>
 
         <section
           aria-label="Listado de tareas"
-          className="space-y-4 lg:col-span-8"
+          className="min-w-0 space-y-4 lg:col-span-8"
         >
           <StatusFilterBar
             counts={counts}
@@ -288,7 +321,7 @@ export function TaskBoard() {
               )}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="min-w-0 space-y-3">
               {visibleItems.map((item) => (
                 <TaskCard
                   key={item.id}
